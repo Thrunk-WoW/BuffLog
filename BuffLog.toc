@@ -1,0 +1,8 @@
+## Interface: 11200
+## Title: BuffLog
+## Author: Thrunk
+## Version: 1
+## Notes: Buff Logout
+
+
+BuffLog.lua
