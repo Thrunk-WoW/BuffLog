@@ -24,7 +24,7 @@ local function SlashCmdHandler(msg)
         isUserAFK = false
         DEFAULT_CHAT_FRAME:AddMessage("Buff logout disabled.", 1, 1, 0)
     else
-        DEFAULT_CHAT_FRAME:AddMessage("Usage: /bufflog on | off", 1, 0, 0)
+        DEFAULT_CHAT_FRAME:AddMessage("Usage: /bufflog on | off", 1, 1, 0)
     end
 end
 
