@@ -1,28 +1,32 @@
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("COMBAT_TEXT_UPDATE")
 frame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-local isBuffLogEnabled = false  -- Default: off
-local isUserAfk = false --Default: off
+local isBuffZone = false  -- Default: off
+local isAutoLogOn = false --Default: off
 
-local function UpdateBuffLogState()
+local function UpdateZone()
     local zone = GetRealZoneText()  -- Get current zone name
     if zone == "Orgrimmar" or zone == "Stranglethorn Vale" or zone == "Stormwind" then
-        isBuffLogEnabled = true
-        --DEFAULT_CHAT_FRAME:AddMessage("Buff logout enabled in " .. zone .. ".", 1, 1, 0)
+        isBuffZone = true
+		if isAutoLogOn then
+			DEFAULT_CHAT_FRAME:AddMessage("Auto Buff Logout currently enabled in " .. zone .. "", 1, 1, 0)
+		else
+			DEFAULT_CHAT_FRAME:AddMessage("Type \"/bufflog on\" to enable Auto Buff Logout in " .. zone .. "", 1, 1, 0)
+		end
     else
-        isBuffLogEnabled = false
-        --DEFAULT_CHAT_FRAME:AddMessage("Buff logout disabled outside Orgrimmar/Booty Bay.", 1, 1, 0)
+        isBuffZone = false
     end
 end
 
 local function SlashCmdHandler(msg)
     if msg == "on" then
-        isUserAFK = true
-        DEFAULT_CHAT_FRAME:AddMessage("Buff logout enabled.", 1, 1, 0)
+        isAutoLogOn = true
+        DEFAULT_CHAT_FRAME:AddMessage("Auto Buff Logout enabled", 1, 1, 0)
     elseif msg == "off" then
-        isUserAFK = false
-        DEFAULT_CHAT_FRAME:AddMessage("Buff logout disabled.", 1, 1, 0)
+        isAutoLogOn = false
+        DEFAULT_CHAT_FRAME:AddMessage("Auto Buff Logout disabled", 1, 1, 0)
     else
         DEFAULT_CHAT_FRAME:AddMessage("Usage: /bufflog on | off", 1, 1, 0)
     end
@@ -32,9 +36,9 @@ SLASH_BUFFLOG1 = "/bufflog"
 SlashCmdList["BUFFLOG"] = SlashCmdHandler
 
 frame:SetScript("OnEvent", function()
-    if event == "ZONE_CHANGED_NEW_AREA" then
-        UpdateBuffLogState()
-    elseif event == "COMBAT_TEXT_UPDATE" and isBuffLogEnabled and isUserAFK then
+    if event == "ZONE_CHANGED_NEW_AREA" or event == "PLAYER_ENTERING_WORLD" then
+        UpdateZone()
+    elseif event == "COMBAT_TEXT_UPDATE" and isBuffZone and isAutoLogOn then
         if arg1 == "AURA_START" then
             if arg2 == "Rallying Cry of the Dragonslayer" or 
                arg2 == "Warchief's Blessing" or 
@@ -44,6 +48,3 @@ frame:SetScript("OnEvent", function()
         end
     end
 end)
-
--- Run on load to check the zone immediately
-UpdateBuffLogState()
